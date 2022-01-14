@@ -1,23 +1,40 @@
 <template>
   <div class="ctr">
-    <question />
-    <results />
-    <button type="button" class="reset-btn">Reset</button>
+    <transition-group name="fade" mode="out-in">
+      <questions
+        v-if="questionsAnswered < questions.length"
+        :questions="questions"
+        :questionsAnswered="questionsAnswered"
+        @question-answered="questionAnswered"
+      />
+      <results v-else :results="results" :totalCorrect="totalCorrect" />
+
+      <button
+        type="button"
+        class="reset-btn"
+        @click.prevent="resetQuiz"
+        v-if="this.questionsAnswered === questions.length"
+      >
+        Reset
+      </button>
+    </transition-group>
   </div>
 </template>
 
 <script>
-import Question from "./components/Question.vue";
+import Questions from "./components/Questions.vue";
 import Results from "./components/Results.vue";
 
 export default {
   name: "App",
   components: {
-    Question,
+    Questions,
     Results,
   },
   data() {
     return {
+      questionsAnswered: 0,
+      totalCorrect: 0,
       questions: [
         {
           q: "What is 2 + 2?",
@@ -95,7 +112,18 @@ export default {
       ],
     };
   },
+  methods: {
+    questionAnswered(is_correct) {
+      if (is_correct) {
+        this.totalCorrect++;
+      }
+      this.questionsAnswered++;
+      console.log(this.totalCorrect);
+    },
+    resetQuiz() {
+      this.questionsAnswered = 0;
+      this.totalCorrect = 0;
+    },
+  },
 };
 </script>
-
-<style></style>
